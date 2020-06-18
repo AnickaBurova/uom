@@ -810,18 +810,20 @@ macro_rules! system {
             /// * `E`: `typenum::Integer` power.
             #[inline(always)]
             pub fn powi<E>(
-                self, e: E
+                self, _e: E
             ) -> Quantity<$quantities<$($crate::typenum::Prod<D::$symbol, E>),+>, U, V>
             where
                 $(D::$symbol: $crate::lib::ops::Mul<E>,)+
                 D::Kind: $crate::marker::Mul,
                 E: $crate::typenum::Integer,
-                V: $crate::typenum::Pow<E, Output = V> + $crate::Conversion<V>,
+                V: $crate::Conversion<V>,
             {
+                use $crate::ConversionFactor;
+
                 Quantity {
                     dimension: $crate::lib::marker::PhantomData,
                     units: $crate::lib::marker::PhantomData,
-                    value: $crate::typenum::Pow::powi(self.value, e),
+                    value: self.value.into_conversion().powi(E::to_i32()).value(),
                 }
             }
 
